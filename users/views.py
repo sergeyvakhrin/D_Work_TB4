@@ -1,5 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework import status, generics
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -59,18 +60,18 @@ class UserUpdateAPIView(generics.UpdateAPIView):
         проверяет на наличие в базе и связывает с пользователем
         """
         user = self.request.user
-        print(user)
+        if user.user_referral:
+            raise APIException('Referral already input.')
+
         input_referral = serializer.validated_data['user_referral']
-        print(input_referral)
 
         referral = Referral.objects.filter(referral=input_referral).first()
-        print(referral)
         if not referral:
-            return Response({"message": "Referral not found."}, status=status.HTTP_400_BAD_REQUEST)
+            raise APIException("Referral not found.")
         else:
             user.user_referral = Referral.objects.get(pk=referral.pk)
             user.save()
-            return Response({"message": "Referral save."}, status=status.HTTP_200_OK)
+            return Response({"message": "Referral saved."})
 
 
 class UserDeleteAPIView(generics.DestroyAPIView):
