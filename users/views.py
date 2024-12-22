@@ -18,12 +18,12 @@ class SMSAuthenticationView(APIView):
         phone = serializer.validated_data['phone']
 
         # Проверяем, есть ли телефон в базе данных
-        user = User.objects.filter(phone=phone)
+        user = User.objects.filter(phone=phone).first()
         if user:
             # Если телефон существует, отправляем SMS
             sms_password = send_sms(phone)
-            user[0].set_password(sms_password)
-            user[0].save()
+            user.set_password(sms_password)
+            user.save()
             return Response({"message": "SMS sent to existing user."}, status=status.HTTP_200_OK)
         else:
             # Если телефона нет, создаем новую запись в базе
@@ -52,6 +52,25 @@ class UserUpdateAPIView(generics.UpdateAPIView):
     """ Обновление профиля пользователя """
     serializer_class = UserSerializer
     queryset = User.objects.all()
+
+    def perform_update(self, serializer):
+        """
+        Перехватывает передаваемый пользователем user_referral,
+        проверяет на наличие в базе и связывает с пользователем
+        """
+        user = self.request.user
+        print(user)
+        input_referral = serializer.validated_data['user_referral']
+        print(input_referral)
+
+        referral = Referral.objects.filter(referral=input_referral).first()
+        print(referral)
+        if not referral:
+            return Response({"message": "Referral not found."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user.user_referral = Referral.objects.get(pk=referral.pk)
+            user.save()
+            return Response({"message": "Referral save."}, status=status.HTTP_200_OK)
 
 
 class UserDeleteAPIView(generics.DestroyAPIView):

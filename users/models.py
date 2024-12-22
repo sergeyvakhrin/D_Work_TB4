@@ -14,8 +14,9 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, verbose_name="Фамилия", help_text="Укажите фамилию", **NULLABLE, db_index=True)
     avatar = models.ImageField(upload_to='users/avatar', verbose_name="Фото", help_text="Загрузите фото", **NULLABLE, db_index=True)
     self_referral = models.OneToOneField('Referral', on_delete=models.CASCADE, verbose_name="Реферал", **NULLABLE, related_name='self_referral', db_index=True)
-    user_referral = models.OneToOneField('Referral', on_delete=models.SET_NULL, verbose_name="Реферальная ссылка", **NULLABLE, related_name='user_referral', db_index=True)
-    sms_code = models.CharField(max_length=4, **NULLABLE, db_index=True)
+    user_referral = models.ForeignKey('Referral', to_field='referral', on_delete=models.SET_NULL, verbose_name="Реферальная ссылка", **NULLABLE, related_name='user_referral', db_index=True)
+    # sms_code = models.CharField(max_length=4, **NULLABLE, db_index=True)
+    # input_referral = models.CharField(max_length=6, **NULLABLE, verbose_name='Вводимый реферал другого пользователя', help_text='Укажите реферал другого пользователя', db_index=True)
 
 
     def __str__(self):
