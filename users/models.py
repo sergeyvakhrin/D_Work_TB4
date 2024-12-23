@@ -12,7 +12,7 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=50, verbose_name="Имя", help_text="Укажите имя", **NULLABLE, db_index=True)
     last_name = models.CharField(max_length=50, verbose_name="Фамилия", help_text="Укажите фамилию", **NULLABLE, db_index=True)
     avatar = models.ImageField(upload_to='users/avatar', verbose_name="Фото", help_text="Загрузите фото", **NULLABLE, db_index=True)
-    self_referral = models.OneToOneField('Referral', on_delete=models.CASCADE, verbose_name="Реферал", **NULLABLE, related_name='self_referral', db_index=True)
+    self_referral = models.OneToOneField('Referral', to_field='referral', on_delete=models.CASCADE, verbose_name="Реферал", **NULLABLE, related_name='self_referral', db_index=True)
     user_referral = models.ForeignKey('Referral', to_field='referral', on_delete=models.SET_NULL, verbose_name="Реферальная ссылка", **NULLABLE, related_name='user_referral', db_index=True)
 
     def __str__(self):
