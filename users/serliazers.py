@@ -1,10 +1,12 @@
 import secrets
 
-from kombu.pools import reset
+from prompt_toolkit.validation import ValidationError
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from users.models import User, Referral
+from users.servises import send_sms
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -28,14 +30,46 @@ class PhoneSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=35)
 
 
+# class ReferralSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Referral
+#         fields = ('referral', )
+
+
 class UserSerializer(serializers.ModelSerializer):
     users_list = serializers.SerializerMethodField()
+    # Ограничиваем доступ на редактирование собственного реферрала
+    # self_referral = ReferralSerializer(read_only=True)
 
     class Meta:
         model = User
         # fields = '__all__'
         # Исключаем поля для frontend
-        exclude = ('id', 'password', 'last_login', 'is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions')
+        exclude = ('id', 'password', 'last_login', 'is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions', )
+
+    def validate_user_referral(self, value):
+        """ Если user_referral уже вводилась, генерирует ошибку """
+        if self.instance.user_referral:
+            raise APIException("You may not edit user_referral.")
+        return value
+
+    def validate_self_referral(self, value):
+        """ Генерирует ошибку при попытке изменения self_referral """
+        if self.instance.self_referral:
+            raise APIException("You may not edit self_referral.")
+        return value
+
+    def validate_phone(self, value):
+        """ Отправка смс при смене номера телефона """
+        if str(self.instance) != value:
+            # Получаем объект у которого меняется номмер телефона
+            user = self.instance
+            # Получаем смс-код на новый телефон
+            sms_password = send_sms(value)
+            user.set_password(sms_password)
+            return value
+        else:
+            return str(self.instance)
 
     def get_users_list(self, instance):
         """
@@ -44,3 +78,6 @@ class UserSerializer(serializers.ModelSerializer):
         """
         users_list = User.objects.filter(user_referral=instance.self_referral)
         return [user.phone for user in users_list]
+
+    # def get_user_referrall(self, instance):
+    #     return User.objects.get(user_referral=instance.user_referral)

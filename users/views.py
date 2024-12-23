@@ -61,24 +61,24 @@ class UserUpdateAPIView(generics.UpdateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
-    def perform_update(self, serializer):
-        """
-        Перехватывает передаваемый пользователем user_referral,
-        проверяет на наличие в базе и связывает с пользователем
-        """
-        user = self.request.user
-        if user.user_referral:
-            raise APIException('Referral already input.')
-
-        input_referral = serializer.validated_data['user_referral']
-
-        referral = Referral.objects.filter(referral=input_referral).first()
-        if not referral:
-            raise APIException("Referral not found.")
-        else:
-            user.user_referral = Referral.objects.get(pk=referral.pk)
-            user.save()
-            return Response({"message": "Referral saved."})
+    # def perform_update(self, serializer):
+    #     """
+    #     Перехватывает передаваемый пользователем user_referral,
+    #     проверяет на наличие в базе и связывает с пользователем
+    #     """
+    #     user = self.request.user
+    #     if user.user_referral:
+    #         raise APIException('Referral already input.')
+    #
+    #     input_referral = serializer.validated_data['user_referral']
+    #
+    #     referral = Referral.objects.filter(referral=input_referral).first()
+    #     if not referral:
+    #         raise APIException("Referral not found.")
+    #     else:
+    #         user.user_referral = Referral.objects.get(pk=referral.pk)
+    #         user.save()
+    #         return Response({"message": "Referral saved."})
 
 
 class UserDeleteAPIView(generics.DestroyAPIView):
@@ -91,3 +91,8 @@ class UserListAPIView(generics.ListAPIView):
     """ Получение списка пользователей """
     serializer_class = UserSerializer
     queryset = User.objects.all()
+
+
+class PhoneUpdateAPIView(generics.UpdateAPIView):
+    """ При смене телефона приходит подтверждающая смс и нужно ввести на update/sms/<int:pk>/ """
+    pass

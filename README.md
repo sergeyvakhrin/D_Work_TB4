@@ -35,7 +35,7 @@
     "self_referral": 3,
     "user_referral": null
     }
-2. ввести один раз инвайт-код другого пользователя отправив PATCH-запрос на /users/update/"pk"/
+2. Ввести один раз инвайт-код другого пользователя отправив PATCH-запрос на /users/update/"pk"/
         {
             "user_referral": "222222"
         }

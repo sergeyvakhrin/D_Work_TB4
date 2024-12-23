@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from users.apps import UsersConfig
 from users.views import SMSAuthenticationView, UserRetrieveAPIView, UserUpdateAPIView, UserDeleteAPIView, \
-    UserListAPIView, MyTokenObtainPairView
+    UserListAPIView, MyTokenObtainPairView, PhoneUpdateAPIView
 
 app_name = UsersConfig.name
 
@@ -18,5 +18,6 @@ urlpatterns = [
     path('users/', UserListAPIView.as_view(), name="user-list"),
     path('<int:pk>/', UserRetrieveAPIView.as_view(permission_classes=(AllowAny, )), name='user-get'),
     path('update/<int:pk>/', UserUpdateAPIView.as_view(permission_classes=(AllowAny, )), name='user-update'),
+    path('update/sms/<int:pk>/', PhoneUpdateAPIView.as_view(permission_classes=(AllowAny, )), name='phone-update'),
     path('delete/<int:pk>/', UserDeleteAPIView.as_view(permission_classes=(AllowAny, )), name='user-delete'),
 ]
