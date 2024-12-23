@@ -1,6 +1,26 @@
+import secrets
+
+from kombu.pools import reset
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from users.models import User, Referral
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """ Кастомный сериализатор для сброса пароля после авторизации """
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        # Дополнительные поля помимо токенов
+        data['phone'] = self.user.phone
+
+        # Сбрасываем пароль, что бы по предыдущей смс не было возможности зайти
+        reset_password = secrets.token_hex(16)
+        print(reset_password)
+        self.user.set_password(reset_password)
+        self.user.save()
+        return data
 
 
 class PhoneSerializer(serializers.Serializer):

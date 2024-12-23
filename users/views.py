@@ -2,11 +2,13 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import status, generics
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from users.models import User, Referral
-from users.serliazers import PhoneSerializer, UserSerializer
+from users.serliazers import PhoneSerializer, UserSerializer, MyTokenObtainPairSerializer
 from users.servises import send_sms, get_valid_self_referral
 
 
@@ -41,6 +43,11 @@ class SMSAuthenticationView(APIView):
                 password=make_password(sms_password)
             )
             return Response({"message": "User created and SMS sent."}, status=status.HTTP_201_CREATED)
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    """ Кастомный контроллер для сброса пароля после авторизации """
+    serializer_class = MyTokenObtainPairSerializer
 
 
 class UserRetrieveAPIView(generics.RetrieveAPIView):
