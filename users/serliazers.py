@@ -48,7 +48,7 @@ class UserSerializer(serializers.ModelSerializer):
         exclude = ('id', 'password', 'last_login', 'is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions', )
 
     def validate_user_referral(self, value):
-        """ Если user_referral уже вводилась, генерирует ошибку """
+        """ Если user_referral уже вводился, генерирует ошибку """
         if self.instance.user_referral:
             raise APIException("You may not edit user_referral.")
         return value
@@ -62,12 +62,23 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_phone(self, value):
         """ Отправка смс при смене номера телефона """
         if str(self.instance) != value:
-            # Получаем объект у которого меняется номмер телефона
+            # Получаем объект у которого меняется номер телефона
             user = self.instance
             # Получаем смс-код на новый телефон
             sms_password = send_sms(value)
+            user.sms_code = sms_password + value
+
+            # TODO: Тут нужно реализовать проверку получения смс на новый телефон. Если получили смс, то сохраняем новый номер
+            # TODO: Пока идея реализации отдельным запросом с отправкой нового номера и смс-кода
+
+            # TODO: При PUT запросе на /update/pk/ профиля, если вводится новый номер телефона, высылается смс на новый
+            # TODO: телефон, но сам телефон не меняется. И при PUT запросе на /update/sms/pk/ передается новый телефон
+            # TODO: и смс - код. Если смс код верный, то телефон меняется.
+            # TODO: Как-то сложно... но пока придумал так.
+
             user.set_password(sms_password)
-            return value
+            user.save()
+            return str(self.instance)
         else:
             return str(self.instance)
 
@@ -81,3 +92,18 @@ class UserSerializer(serializers.ModelSerializer):
 
     # def get_user_referrall(self, instance):
     #     return User.objects.get(user_referral=instance.user_referral)
+
+
+class UserPhoneUpdateSerializer(serializers.ModelSerializer):
+    """ Сериалайзер для смены номера телефона профиля """
+    class Meta:
+        model = User
+        fields = ('phone', 'sms_code', )
+
+    def validate_phone(self, value):
+        """ проверяет вводимую пару смс-код и номер телефона """
+        user = self.instance
+        sms_code = self.initial_data['sms_code']
+        if user.sms_code == sms_code + value:
+            return value
+        raise APIException("Incorrect phone/sms pair.")

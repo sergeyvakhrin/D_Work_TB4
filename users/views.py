@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from users.models import User, Referral
-from users.serliazers import PhoneSerializer, UserSerializer, MyTokenObtainPairSerializer
+from users.serliazers import PhoneSerializer, UserSerializer, MyTokenObtainPairSerializer, UserPhoneUpdateSerializer
 from users.servises import send_sms, get_valid_self_referral
 
 
@@ -94,5 +94,7 @@ class UserListAPIView(generics.ListAPIView):
 
 
 class PhoneUpdateAPIView(generics.UpdateAPIView):
-    """ При смене телефона приходит подтверждающая смс и нужно ввести на update/sms/<int:pk>/ """
-    pass
+    """ При смене телефона приходит подтверждающая смс и нужно ввести на update/sms/{id}/ """
+    serializer_class = UserPhoneUpdateSerializer
+    queryset = User.objects.all()
+
