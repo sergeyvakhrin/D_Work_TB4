@@ -14,6 +14,9 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='users/avatar', verbose_name="Фото", help_text="Загрузите фото", **NULLABLE, db_index=True)
     self_referral = models.OneToOneField('Referral', to_field='referral', on_delete=models.CASCADE, verbose_name="Реферал", **NULLABLE, related_name='self_referral', db_index=True)
     user_referral = models.ForeignKey('Referral', to_field='referral', on_delete=models.SET_NULL, verbose_name="Реферальная ссылка", **NULLABLE, related_name='user_referral', db_index=True)
+    sms_code = models.CharField(max_length=39, help_text="Введите СМС-код", **NULLABLE)
+
+    # TODO: Можно добавить альтернативный телефон для входа и получение кода на email
 
     def __str__(self):
         return self.phone

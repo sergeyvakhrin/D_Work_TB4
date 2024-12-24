@@ -166,7 +166,7 @@
 					"path": [
 						"users",
 						"update",
-						"4",
+						"8",
 						""
 					]
 				}
@@ -237,7 +237,48 @@
 					"path": [
 						"users",
 						"delete",
-						"5",
+						"7",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/users/update/sms/6/",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0OTY2ODE0LCJpYXQiOjE3MzQ5NjU5MTQsImp0aSI6Ijk1MjA5NWUyNzY4NTQyMjA4NWJkNzcwM2EzZjU2NWQxIiwidXNlcl9pZCI6Nn0.vz2Mjyo1fo68fxvfsU1s1yhXV7C4Cu4_LSLrTcmqFSw",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"phone\": \"+71111111116\",\r\n    \"sms_code\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/users/update/sms/6/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"users",
+						"update",
+						"sms",
+						"6",
 						""
 					]
 				}
