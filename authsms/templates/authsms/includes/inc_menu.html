@@ -12,10 +12,10 @@
 
                     <li><a href="{% url 'authsms:home' %}" class="text-white">Главная</a></li>
                     {% if user.is_authenticated %}
-                        <li><a href="#" class="text-white">Профиль</a></li>
+                        <li><a href="{% url 'users:profile' %}" class="text-white">Профиль</a></li>
                         <li><a href="{% url 'users:logout' %}" class="text-white">Выход</a></li>
                     {% else %}
-                        <li><a href="{% url 'users:register' %}" class="text-white">Авторизация</a></li>
+                        <li><a href="{% url 'users:sms_auth' %}" class="text-white">Авторизация</a></li>
                     {% endif %}
 
                 </ul>

@@ -1,13 +1,10 @@
-from django.contrib.auth.hashers import make_password
-from rest_framework import status, generics
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from users.models import User, Referral
+from users.models import User
 from users.serliazers import PhoneSerializer, UserSerializer, MyTokenObtainPairSerializer, UserPhoneUpdateSerializer
-from users.servises import send_sms, get_valid_self_referral, user_validation
+from users.servises import user_validation
 
 
 class SMSAuthenticationView(APIView):
@@ -20,7 +17,7 @@ class SMSAuthenticationView(APIView):
         response = user_validation(phone)
         return response
 
-        # # Проверяем, есть ли телефон в базе данных
+        # # Проверяем, есть ли телефон в базе данных    ПЕРЕНЕСЕНО в сервисную прослойку user_validation()
         # user = User.objects.filter(phone=phone).first()
         # if user:
         #     # Если телефон существует, отправляем SMS
