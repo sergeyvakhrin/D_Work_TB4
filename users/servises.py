@@ -64,7 +64,7 @@ def user_validation(phone):
 
 
 class IsOwner(permissions.BasePermission):
-    """Проверяем права на просмотр и редактирование."""
+    """ Проверяем права на просмотр и редактирование."""
     def has_object_permission(self, request, view, obj):
         if obj.phone == request.user.phone:
             return True
