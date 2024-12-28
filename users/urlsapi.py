@@ -16,8 +16,8 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(permission_classes=(AllowAny, )), name='token_refresh'),
 
     path('users/', UserListAPIView.as_view(), name="user-list"),
-    path('<int:pk>/', UserRetrieveAPIView.as_view(permission_classes=(AllowAny, )), name='user-get'),
-    path('update/<int:pk>/', UserUpdateAPIView.as_view(permission_classes=(AllowAny, )), name='user-update'),
-    path('update/sms/<int:pk>/', PhoneUpdateAPIView.as_view(permission_classes=(AllowAny, )), name='phone-update'),
-    path('delete/<int:pk>/', UserDeleteAPIView.as_view(permission_classes=(AllowAny, )), name='user-delete'),
+    path('<int:pk>/', UserRetrieveAPIView.as_view(), name='user-get'),
+    path('update/<int:pk>/', UserUpdateAPIView.as_view(), name='user-update'),
+    path('update/sms/<int:pk>/', PhoneUpdateAPIView.as_view(), name='phone-update'),
+    path('delete/<int:pk>/', UserDeleteAPIView.as_view(), name='user-delete'),
 ]

@@ -1,17 +1,23 @@
 import secrets
 import time
+import random
 
 from django.contrib.auth.hashers import make_password
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.response import Response
-
+from django.contrib.auth.models import Group
 from users.models import Referral, User
 
 
 def send_sms(phone):
     """ Функция получения смс с задержкой 2 секунды """
     time.sleep(2)
-    sms_code = '1234'
+
+    cookies = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    a = random.sample(cookies, 4)
+    sms_code = ''.join(a)
+
+    # sms_code = '1234'
     print(f'send_sms {phone}') # TODO: реализовать с помощью https://smsaero.ru/integration/api/
     print(f'sms-code: {sms_code}')
     return sms_code
@@ -49,6 +55,17 @@ def user_validation(phone):
         User.objects.create(
             phone=phone,
             self_referral=Referral.objects.get(referral=self_referral),
-            password=make_password(sms_password)
+            password=make_password(sms_password),
         )
+        # Добавляем нового пользователя в группу Users, что бы работали permissions
+        user = User.objects.get(phone=phone)
+        user.groups.add(Group.objects.get(name='users'))
         return Response({"message": "User created and SMS sent."}, status=status.HTTP_201_CREATED)
+
+
+class IsOwner(permissions.BasePermission):
+    """Проверяем права на просмотр и редактирование."""
+    def has_object_permission(self, request, view, obj):
+        if obj.phone == request.user.phone:
+            return True
+        return False

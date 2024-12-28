@@ -1,9 +1,12 @@
 import secrets
 
 from django.contrib.auth import logout
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
 from django.shortcuts import redirect
 from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy, reverse
+from rest_framework.exceptions import PermissionDenied
 
 from users.forms import UserRegisterForm, UserProfileForm, UserChangePhoneForm
 from users.models import User
@@ -33,10 +36,11 @@ def logout_view(request):
     return redirect('/')
 
 
-class UserProfileView(UpdateView):
+class UserProfileView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """ Класс для просмотра и редактирования профиля пользователя """
     model = User
     form_class = UserProfileForm
+    permission_required = 'users.change_user'
     success_url = reverse_lazy('users:profile')
 
     def get_object(self, queryset=None):
@@ -48,6 +52,14 @@ class UserProfileView(UpdateView):
         user_phone = user.phone
         print(user.pk)
         input_phone = request._post.get('phone')
+
+        # TODO: Проверяем уникальность введенного телефона. Если не уникальный, оставляем старый.
+        # user_input = User.objects.filter(phone=input_phone).first()
+        # if user_input:
+        #     # raise forms.ValidationError('The entered phone number is already in use.')
+        #     # request._post['phone'] = user.phone
+
+        # Отлавливаем изменение номера телефона
         if user.phone != input_phone:
             print("Изменился номер телефона")
             sms_code = send_sms(input_phone)
@@ -58,11 +70,17 @@ class UserProfileView(UpdateView):
         return super().post(self, request, *args, **kwargs)
 
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """ Класс для подтверждения изменения номера телефона профиля """
     model = User
     form_class = UserChangePhoneForm
+    permission_required = 'users.change_user'
     success_url = reverse_lazy('users:sms_auth')
 
-
+    def get_form_class(self):
+        """ Устраняем возможность редактирования телефона при ручном введении в адресной строке """
+        user = self.request.user
+        if user == self.object:
+            return UserChangePhoneForm
+        raise PermissionDenied
 
