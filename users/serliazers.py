@@ -45,7 +45,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         # fields = '__all__'
         # Исключаем поля для frontend
-        exclude = ('id', 'password', 'last_login', 'is_superuser', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions', )
+        exclude = ('id', 'password', 'last_login', 'is_active', 'date_joined', 'groups', 'user_permissions', )
+        # TODO: Из exclude пришлось убрать is_staff и is_superuser, так как для работы permission необходимо
+        # TODO: создать группу и в ней установит права. А для создания группы, нужно попасть в админку.
+        # TODO: В API приложения возможно обратиться к этим полям /api/authsms/update/1/
+        # TODO: Сначала создается первый пользователь и меняется у него is_staff и is_superuser
 
     def validate_user_referral(self, value):
         """ Если user_referral уже вводился, генерирует ошибку """
