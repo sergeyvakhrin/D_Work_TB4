@@ -8,6 +8,7 @@ python-dotenv
 django-filter
 drf-yasg
 django-cors-headers
+django-celery-beat
 djangorestframework-simplejwt
 eventlet
 coverage
