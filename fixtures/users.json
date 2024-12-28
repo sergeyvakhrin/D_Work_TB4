@@ -1,0 +1,184 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$ZeMlEOj3KdJh9fQnnJYzPy$q3GtCv7GR2pbhUhY63aLTMDmWOJSDX5CYV+VM6NWLZ4=",
+      "last_login": "2024-12-28T08:48:43.041Z",
+      "is_superuser": true,
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-12-28T08:37:54.844Z",
+      "phone": "+78888888888",
+      "email": "admin@sky.pro",
+      "first_name": "Admin",
+      "last_name": "SkyPro",
+      "avatar": "",
+      "self_referral": "111111",
+      "user_referral": null,
+      "sms_code": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$P7096Y1D92GJUtzc0QCaNe$Lo81RZiP0q9WSQUDGCcnL7qrFi9AImiU9mHC9jdbhzw=",
+      "last_login": "2024-12-28T09:19:58.739Z",
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-28T08:43:28.759Z",
+      "phone": "+71111111116",
+      "email": "",
+      "first_name": null,
+      "last_name": null,
+      "avatar": "",
+      "self_referral": "f83dfd",
+      "user_referral": null,
+      "sms_code": "1579+71111111116",
+      "groups": [
+        1
+      ],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$2ArmvOLattkMulFKFGWKbD$lRHL/t/jnC51bFldqm075KE+IiY5eF9fMwA4LxulCJg=",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-28T08:46:33.019Z",
+      "phone": "+71111111113",
+      "email": null,
+      "first_name": null,
+      "last_name": null,
+      "avatar": "",
+      "self_referral": "316dfe",
+      "user_referral": null,
+      "sms_code": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$pdhzdk5Lhhs0Tl6JD3HMQ2$pNCT2sB+DOggdu7duQpzqjhXvJIekiHFylVOxPxsdII=",
+      "last_login": "2024-12-28T08:55:26.730Z",
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-28T08:49:14.504Z",
+      "phone": "+71111111115",
+      "email": "parlamentsv@mail.ru",
+      "first_name": null,
+      "last_name": "Сергей",
+      "avatar": "",
+      "self_referral": "3349e7",
+      "user_referral": "111111",
+      "sms_code": "2986+71111111115",
+      "groups": [
+        1
+      ],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$PY1tu64kHubzr3jGT3kLhO$Sn8luK+0KaGFUuZl5SRC9p8qAAlHeL9+jvWR55tvdG8=",
+      "last_login": "2024-12-28T09:30:28.147Z",
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-28T09:30:12.598Z",
+      "phone": "+71111111112",
+      "email": "",
+      "first_name": null,
+      "last_name": null,
+      "avatar": "",
+      "self_referral": "7935ad",
+      "user_referral": "111111",
+      "sms_code": null,
+      "groups": [
+        1
+      ],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 6,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$R630XepK3KMok91eGBvX26$qVftBMVysiyEtbt4+heG8yAmX6FWBJNlgpAb51N1n50=",
+      "last_login": "2024-12-28T09:36:03.504Z",
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-28T09:34:52.199Z",
+      "phone": "+71111111117",
+      "email": null,
+      "first_name": null,
+      "last_name": null,
+      "avatar": "",
+      "self_referral": "8ee291",
+      "user_referral": "111111",
+      "sms_code": "6319",
+      "groups": [
+        1
+      ],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.referral",
+    "pk": 1,
+    "fields": {
+      "referral": "111111"
+    }
+  },
+  {
+    "model": "users.referral",
+    "pk": 2,
+    "fields": {
+      "referral": "f83dfd"
+    }
+  },
+  {
+    "model": "users.referral",
+    "pk": 3,
+    "fields": {
+      "referral": "316dfe"
+    }
+  },
+  {
+    "model": "users.referral",
+    "pk": 4,
+    "fields": {
+      "referral": "3349e7"
+    }
+  },
+  {
+    "model": "users.referral",
+    "pk": 5,
+    "fields": {
+      "referral": "7935ad"
+    }
+  },
+  {
+    "model": "users.referral",
+    "pk": 6,
+    "fields": {
+      "referral": "8ee291"
+    }
+  }
+]

@@ -47,8 +47,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_yasg',
     'corsheaders',
-
-    'users'
+    "django_celery_beat",
+    'users',
+    'authsms',
 ]
 
 REST_FRAMEWORK = {
@@ -57,7 +58,7 @@ REST_FRAMEWORK = {
     ),
     # Настройки JWT-токенов
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication',],
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny',], # AllowAny закрывать во view
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated',], # AllowAny закрывать во view
                                                      # IsAuthenticated закрыть от всех не авторезированных
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', # Пагинация по умолчанию для всего проекта
@@ -79,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -159,7 +161,15 @@ STATICFILES_DIRS = (BASE_DIR / 'static',)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 AUTH_USER_MODEL = 'users.User'
+
+LOGIN_REDIRECT_URL = '/users/profile/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/users/register/'
 
 
 CORS_ALLOWED_ORIGINS = [
