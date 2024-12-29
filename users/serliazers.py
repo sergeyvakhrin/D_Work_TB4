@@ -1,11 +1,10 @@
 import secrets
 
-from prompt_toolkit.validation import ValidationError
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from users.models import User, Referral
+from users.models import User
 from users.servises import send_sms
 
 
@@ -31,6 +30,7 @@ class PhoneSerializer(serializers.Serializer):
 
 
 # class ReferralSerializer(serializers.ModelSerializer):
+# """ Для получения данных из связанной таблицы """
 #     class Meta:
 #         model = Referral
 #         fields = ('referral', )
@@ -45,11 +45,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         # fields = '__all__'
         # Исключаем поля для frontend
-        exclude = ('id', 'password', 'last_login', 'is_active', 'date_joined', 'groups', 'user_permissions', )
-        # TODO: Из exclude пришлось убрать is_staff и is_superuser, так как для работы permission необходимо
-        # TODO: создать группу и в ней установит права. А для создания группы, нужно попасть в админку.
-        # TODO: В API приложения возможно обратиться к этим полям /api/authsms/update/1/
-        # TODO: Сначала создается первый пользователь и меняется у него is_staff и is_superuser
+        exclude = ('id', 'password', 'last_login', 'is_active', 'date_joined', 'groups', 'user_permissions', 'is_staff', 'is_superuser',)
+        # Из exclude пришлось убрать is_staff и is_superuser, так как для работы permission необходимо
+        # создать группу и в ней установит права. А для создания группы, нужно попасть в админку.
+        # В API приложения возможно обратиться к этим полям /api/authsms/update/1/
+        # Сначала создается первый пользователь и меняется у него is_staff и is_superuser
+        # Вопрос с группой и админом решен в коде servises.py
 
     def validate_user_referral(self, value):
         """ Если user_referral уже вводился, генерирует ошибку """
@@ -77,7 +78,7 @@ class UserSerializer(serializers.ModelSerializer):
 
             # TODO: При PUT запросе на /update/pk/ профиля, если вводится новый номер телефона, высылается смс на новый
             # TODO: телефон, но сам телефон не меняется. И при PUT запросе на /update/sms/pk/ передается новый телефон
-            # TODO: и смс - код. Если смс код верный, то телефон меняется.
+            # TODO: и смс-код. Если смс-код верный, то телефон меняется.
             # TODO: Как-то сложно... но пока придумал так.
 
             user.set_password(sms_password)
@@ -94,7 +95,8 @@ class UserSerializer(serializers.ModelSerializer):
         users_list = User.objects.filter(user_referral=instance.self_referral)
         return [user.phone for user in users_list]
 
-    # def get_user_referrall(self, instance):
+    # def get_user_referral(self, instance):
+    # """ Для получения данных из связанной таблицы """
     #     return User.objects.get(user_referral=instance.user_referral)
 
 
@@ -105,7 +107,7 @@ class UserPhoneUpdateSerializer(serializers.ModelSerializer):
         fields = ('phone', 'sms_code', )
 
     def validate_phone(self, value):
-        """ проверяет вводимую пару смс-код и номер телефона """
+        """ Проверяет вводимую пару смс-код и номер телефона """
         user = self.instance
         sms_code = self.initial_data['sms_code']
         if user.sms_code == sms_code + value:

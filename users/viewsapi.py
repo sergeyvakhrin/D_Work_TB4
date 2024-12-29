@@ -12,6 +12,7 @@ class SMSAuthenticationView(APIView):
     """ Кастомный контроллер обработки пути /auth/sms/ """
     def post(self, request):
         """ Проверяет пользователя в базе и отправляет смс """
+
         serializer = PhoneSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         phone = serializer.validated_data['phone']
