@@ -71,7 +71,7 @@ class UserSerializer(serializers.ModelSerializer):
             user = self.instance
             # Получаем смс-код на новый телефон
             sms_password = send_sms(value)
-            user.sms_code = sms_password + value
+            user.sms_code = sms_password + value # TODO: в тестировании почему-то поле остается None
 
             # TODO: Тут нужно реализовать проверку получения смс на новый телефон. Если получили смс, то сохраняем новый номер
             # TODO: Пока идея реализации отдельным запросом с отправкой нового номера и смс-кода
