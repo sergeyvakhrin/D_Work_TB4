@@ -36,9 +36,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('api/authsms/', include('users.urlsapi', namespace='api_authsms')),
-
-    path('users/', include('users.urls', namespace='users')),
+    path('api/authsms/', include('users.urls', namespace='api_authsms')),
     path('', include('authsms.urls', namespace='authsms')),
 
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

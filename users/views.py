@@ -1,86 +1,103 @@
-import secrets
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from django.contrib.auth import logout
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-
-from django.shortcuts import redirect
-from django.views.generic import CreateView, UpdateView
-from django.urls import reverse_lazy, reverse
-from rest_framework.exceptions import PermissionDenied
-
-from users.forms import UserRegisterForm, UserProfileForm, UserChangePhoneForm
 from users.models import User
-from users.servises import send_sms, user_validation
+from users.serliazers import PhoneSerializer, UserSerializer, MyTokenObtainPairSerializer, UserPhoneUpdateSerializer
+from users.servises import user_validation, IsOwner
 
 
-class RegisterView(CreateView):
-    """ Контроллер регистрации номера телефона на ресурсе """
-    model = User
-    form_class = UserRegisterForm
-    template_name = 'users/register.html'
+class SMSAuthenticationView(APIView):
+    """ Кастомный контроллер обработки пути /auth/sms/ """
+    def post(self, request):
+        """ Проверяет пользователя в базе и отправляет смс """
 
-    def post(self, request, *args, **kwargs):
-        """ Метод для проверки существования введенного номера телефона """
-        phone = request._post.get('phone')
-        user_validation(phone)
-        return redirect(reverse('users:login'))
+        serializer = PhoneSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone = serializer.validated_data['phone']
+        response = user_validation(phone)
+        return response
 
-
-def logout_view(request):
-    """ Функция для кастомного выходы из сервиса """
-    # Подменяем пароль, что бы по старой смс не было возможности зайти
-    user = request.user
-    user.set_password(secrets.token_hex(16))
-    user.save()
-    logout(request)
-    return redirect('/')
-
-
-class UserProfileView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    """ Класс для просмотра и редактирования профиля пользователя """
-    model = User
-    form_class = UserProfileForm
-    permission_required = 'users.change_user'
-    success_url = reverse_lazy('users:profile')
-
-    def get_object(self, queryset=None):
-        return self.request.user
-
-    def post(self, request, *args, **kwargs):
-        """ Метод для отлавливания изменения телефона профиля пользователем """
-        user = self.request.user
-        user_phone = user.phone
-        print(user.pk)
-        input_phone = request._post.get('phone')
-
-        # TODO: Проверяем уникальность введенного телефона. Если не уникальный, оставляем старый.
-        # user_input = User.objects.filter(phone=input_phone).first()
-        # if user_input:
-        #     # raise forms.ValidationError('The entered phone number is already in use.')
-        #     # request._post['phone'] = user.phone
-
-        # Отлавливаем изменение номера телефона
-        if user.phone != input_phone:
-            print("Изменился номер телефона")
-            sms_code = send_sms(input_phone)
-            user.sms_code = sms_code + input_phone
-            user.phone = user_phone
-            user.save()
-            return redirect('users:user_update', pk=user.pk)
-        return super().post(self, request, *args, **kwargs)
+        # # Проверяем, есть ли телефон в базе данных    ПЕРЕНЕСЕНО в сервисную прослойку user_validation()
+        # user = User.objects.filter(phone=phone).first()
+        # if user:
+        #     # Если телефон существует, отправляем SMS
+        #     sms_password = send_sms(phone)
+        #     user.set_password(sms_password)
+        #     user.save()
+        #     return Response({"message": "SMS sent to existing user."}, status=status.HTTP_200_OK)
+        # else:
+        #     # Если телефона нет, создаем новую запись в базе.
+        #     # Получаем реферальную ссылку для нового пользователя.
+        #     self_referral = get_valid_self_referral()
+        #     # Создаем запись в базе реферальных ссылок
+        #     Referral.objects.create(referral=self_referral)
+        #     # Отправляем смс
+        #     sms_password = send_sms(phone)
+        #     # Создаем пользователя с новым телефоном, реферальной ссылкой и кодом из смс
+        #     User.objects.create(
+        #         phone=phone,
+        #         self_referral=Referral.objects.get(referral=self_referral),
+        #         password=make_password(sms_password)
+        #     )
+        #     return Response({"message": "User created and SMS sent."}, status=status.HTTP_201_CREATED)
 
 
-class UserUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    """ Класс для подтверждения изменения номера телефона профиля """
-    model = User
-    form_class = UserChangePhoneForm
-    permission_required = 'users.change_user'
-    success_url = reverse_lazy('users:sms_auth')
+class MyTokenObtainPairView(TokenObtainPairView):
+    """ Кастомный контроллер для сброса пароля после авторизации """
+    serializer_class = MyTokenObtainPairSerializer
 
-    def get_form_class(self):
-        """ Устраняем возможность редактирования телефона при ручном введении в адресной строке """
-        user = self.request.user
-        if user == self.object:
-            return UserChangePhoneForm
-        raise PermissionDenied
 
+class UserRetrieveAPIView(generics.RetrieveAPIView):
+    """ Просмотр профиля пользователя """
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, IsOwner)
+
+
+class UserUpdateAPIView(generics.UpdateAPIView):
+    """ Обновление профиля пользователя """
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, IsOwner)
+
+    # def perform_update(self, serializer): перенесено в сериалайзер
+    #     """
+    #     Перехватывает передаваемый пользователем user_referral,
+    #     проверяет на наличие в базе и связывает с пользователем
+    #     """
+    #     user = self.request.user
+    #     if user.user_referral:
+    #         raise APIException('Referral already input.')
+    #
+    #     input_referral = serializer.validated_data['user_referral']
+    #
+    #     referral = Referral.objects.filter(referral=input_referral).first()
+    #     if not referral:
+    #         raise APIException("Referral not found.")
+    #     else:
+    #         user.user_referral = Referral.objects.get(pk=referral.pk)
+    #         user.save()
+    #         return Response({"message": "Referral saved."})
+
+
+class UserDeleteAPIView(generics.DestroyAPIView):
+    """ Удаление пользователя """
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, IsOwner)
+
+
+class UserListAPIView(generics.ListAPIView):
+    """ Получение списка пользователей """
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, )
+
+
+class PhoneUpdateAPIView(generics.UpdateAPIView):
+    """ При смене телефона приходит подтверждающая смс и нужно ввести на update/sms/{id}/ """
+    serializer_class = UserPhoneUpdateSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, IsOwner)
