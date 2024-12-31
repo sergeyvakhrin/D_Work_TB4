@@ -96,8 +96,8 @@ class UsersTestCase(APITestCase):
     #     url = reverse('users:phone-update', args=(self.user.pk,))
     #     response = self.client.patch(url, data)
     #     print(vars(self.user))
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK) !!!!!!!!!!!!!!!!!!!!!!!!!
-    #     self.assertEqual(self.user.phone, self.data['phone'])       !!!!!!!!!!!!!!!!!!!!!!!!
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)  #!!!!!!!!!!!!!!!!!!!!!!!!!
+    #     self.assertEqual(self.user.phone, self.data['phone'])       #!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 
@@ -127,19 +127,20 @@ class UsersTestCase(APITestCase):
         user_1 = User.objects.get(phone=self.data['phone'])
         user_2 = User.objects.get(phone=self.data_2['phone'])
         user_3 = User.objects.get(phone=self.data_3['phone'])
+        self.client.force_authenticate(user=user_1)
 
         url = reverse('users:user-update', args=(user_1.pk,))
-
         data = {
             "user_referral": user_2.self_referral_id
                 }
-        response = self.client.patch(url, data)
+
+        response = self.client.patch(url, data)   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         self.assertEqual(user_1.user_referral_id, user_2.self_referral_id)
 
         data = {
             "user_referral": user_3.self_referral_id
         }
-        response = self.client.patch(url, data)
+        response = self.client.patch(url, data)    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertEqual(user_1.user_referral_id, user_2.self_referral_id)
 

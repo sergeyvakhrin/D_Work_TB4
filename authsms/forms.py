@@ -47,8 +47,6 @@ class UserChangePhoneForm(ModelForm):
         super().__init__(*args, **kwargs)
         # Очищаем поля ввода
         self.initial['password'] = None
-        self.initial['phone'] = None #TODO: добавить автозаполнение из предыдущей формы с запретом редактирования
-
-
-
-
+        self.initial['phone'] =  self.initial['input_phone']
+        self.fields['phone'].disabled = True
+        # self.fields['phone'].widget.attrs['readonly'] = True
