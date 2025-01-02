@@ -16,7 +16,7 @@ class UserProfileForm(UserChangeForm):
     """ Класс создания формы для просмотра деталей профиля пользователя """
     class Meta:
         model = User
-        fields = ('phone', 'email', 'first_name', 'last_name',  'avatar', 'self_referral', 'user_referral')
+        fields = ('phone', 'email', 'first_name', 'last_name',  'avatar', 'self_referral', 'user_referral',)
 
     def __init__(self, *args, **kwargs):
         """
@@ -47,6 +47,6 @@ class UserChangePhoneForm(ModelForm):
         super().__init__(*args, **kwargs)
         # Очищаем поля ввода
         self.initial['password'] = None
-        self.initial['phone'] =  self.initial['input_phone']
+        self.initial['phone'] = self.initial['input_phone']
         self.fields['phone'].disabled = True
         # self.fields['phone'].widget.attrs['readonly'] = True

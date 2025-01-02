@@ -14,5 +14,4 @@ urlpatterns = [
 
     path('profile/', UserProfileView.as_view(), name='profile'),
     path('update/<int:pk>/', UserUpdateView.as_view(), name='user_update'),
-
 ]
