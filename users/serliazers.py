@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from users.models import User
+from users.models import User, Referral
 from users.servises import send_sms
 
 
@@ -39,6 +39,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_user_referral(self, value):
         """ Если user_referral уже вводился, генерирует ошибку """
+        referral = Referral.objects.filter(referral=value)
+        if referral is None:
+            raise APIException("Such referral does not exist.")
         if self.instance.user_referral:
             raise APIException("You may not edit user_referral.")
         return value
