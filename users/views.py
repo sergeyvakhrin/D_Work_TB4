@@ -19,30 +19,6 @@ class SMSAuthenticationView(APIView):
         response = user_validation(phone)
         return response
 
-        # # Проверяем, есть ли телефон в базе данных    ПЕРЕНЕСЕНО в сервисную прослойку user_validation()
-        # user = User.objects.filter(phone=phone).first()
-        # if user:
-        #     # Если телефон существует, отправляем SMS
-        #     sms_password = send_sms(phone)
-        #     user.set_password(sms_password)
-        #     user.save()
-        #     return Response({"message": "SMS sent to existing user."}, status=status.HTTP_200_OK)
-        # else:
-        #     # Если телефона нет, создаем новую запись в базе.
-        #     # Получаем реферальную ссылку для нового пользователя.
-        #     self_referral = get_valid_self_referral()
-        #     # Создаем запись в базе реферальных ссылок
-        #     Referral.objects.create(referral=self_referral)
-        #     # Отправляем смс
-        #     sms_password = send_sms(phone)
-        #     # Создаем пользователя с новым телефоном, реферальной ссылкой и кодом из смс
-        #     User.objects.create(
-        #         phone=phone,
-        #         self_referral=Referral.objects.get(referral=self_referral),
-        #         password=make_password(sms_password)
-        #     )
-        #     return Response({"message": "User created and SMS sent."}, status=status.HTTP_201_CREATED)
-
 
 class MyTokenObtainPairView(TokenObtainPairView):
     """ Кастомный контроллер для сброса пароля после авторизации """
@@ -61,25 +37,6 @@ class UserUpdateAPIView(generics.UpdateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, IsOwner)
-
-    # def perform_update(self, serializer): перенесено в сериалайзер
-    #     """
-    #     Перехватывает передаваемый пользователем user_referral,
-    #     проверяет на наличие в базе и связывает с пользователем
-    #     """
-    #     user = self.request.user
-    #     if user.user_referral:
-    #         raise APIException('Referral already input.')
-    #
-    #     input_referral = serializer.validated_data['user_referral']
-    #
-    #     referral = Referral.objects.filter(referral=input_referral).first()
-    #     if not referral:
-    #         raise APIException("Referral not found.")
-    #     else:
-    #         user.user_referral = Referral.objects.get(pk=referral.pk)
-    #         user.save()
-    #         return Response({"message": "Referral saved."})
 
 
 class UserDeleteAPIView(generics.DestroyAPIView):

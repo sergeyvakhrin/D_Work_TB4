@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from users.models import User
+from users.models import User, Referral
 from users.servises import send_sms
 
 
@@ -29,31 +29,19 @@ class PhoneSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=35)
 
 
-# class ReferralSerializer(serializers.ModelSerializer):
-# """ Для получения данных из связанной таблицы """
-#     class Meta:
-#         model = Referral
-#         fields = ('referral', )
-
-
 class UserSerializer(serializers.ModelSerializer):
     users_list = serializers.SerializerMethodField()
-    # Ограничиваем доступ на редактирование собственного реферрала
-    # self_referral = ReferralSerializer(read_only=True)
 
     class Meta:
         model = User
-        # fields = '__all__'
         # Исключаем поля для frontend
         exclude = ('id', 'password', 'last_login', 'is_active', 'date_joined', 'groups', 'user_permissions', 'is_staff', 'is_superuser',)
-        # Из exclude пришлось убрать is_staff и is_superuser, так как для работы permission необходимо
-        # создать группу и в ней установит права. А для создания группы, нужно попасть в админку.
-        # В API приложения возможно обратиться к этим полям /api/authsms/update/1/
-        # Сначала создается первый пользователь и меняется у него is_staff и is_superuser
-        # Вопрос с группой и админом решен в коде servises.py
 
     def validate_user_referral(self, value):
         """ Если user_referral уже вводился, генерирует ошибку """
+        referral = Referral.objects.filter(referral=value)
+        if referral is None:
+            raise APIException("Such referral does not exist.")
         if self.instance.user_referral:
             raise APIException("You may not edit user_referral.")
         return value
@@ -71,15 +59,11 @@ class UserSerializer(serializers.ModelSerializer):
             user = self.instance
             # Получаем смс-код на новый телефон
             sms_password = send_sms(value)
-            user.sms_code = sms_password + value # TODO: в тестировании почему-то поле остается None
-
-            # TODO: Тут нужно реализовать проверку получения смс на новый телефон. Если получили смс, то сохраняем новый номер
-            # TODO: Пока идея реализации отдельным запросом с отправкой нового номера и смс-кода
+            user.sms_code = sms_password + value
 
             # TODO: При PUT запросе на /update/pk/ профиля, если вводится новый номер телефона, высылается смс на новый
             # TODO: телефон, но сам телефон не меняется. И при PUT запросе на /update/sms/pk/ передается новый телефон
             # TODO: и смс-код. Если смс-код верный, то телефон меняется.
-            # TODO: Как-то сложно... но пока придумал так.
 
             user.set_password(sms_password)
             user.save()

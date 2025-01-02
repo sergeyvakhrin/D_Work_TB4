@@ -3,6 +3,7 @@ import secrets
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
+
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import UpdateView, CreateView
@@ -59,14 +60,9 @@ class UserProfileView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         print(user.pk)
         input_phone = request._post.get('phone')
 
-        # TODO: Проверяем уникальность введенного телефона. Если не уникальный, оставляем старый.
-        # user_input = User.objects.filter(phone=input_phone).first()
-        # if user_input:
-        #     # raise forms.ValidationError('The entered phone number is already in use.')
-        #     # request._post['phone'] = user.phone
-
         # Отлавливаем изменение номера телефона
         if user.phone != input_phone:
+            self.request.session['input_phone'] = input_phone # Для передачи введенного номера телефона в следующую форму
             print("Изменился номер телефона")
             sms_code = send_sms(input_phone)
             user.sms_code = sms_code + input_phone
@@ -81,7 +77,7 @@ class UserUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = User
     form_class = UserChangePhoneForm
     permission_required = 'users.change_user'
-    success_url = reverse_lazy('authsms:sms_auth')
+    success_url = reverse_lazy('authsms:sms_auth') # TODO: При смене номера телефона в базе слетает авторизация. Нужно как-то это исправить
 
     def get_form_class(self):
         """ Устраняем возможность редактирования телефона при ручном введении в адресной строке """
@@ -90,3 +86,10 @@ class UserUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
             return UserChangePhoneForm
         raise PermissionDenied
 
+    def get_initial(self):
+        """ Для передачи введенного номера телефона в следующую форму """
+        initial = super().get_initial()
+        input_phone = self.request.session.get('input_phone', None)
+        if input_phone:
+            initial.update({'input_phone': input_phone})
+        return initial
