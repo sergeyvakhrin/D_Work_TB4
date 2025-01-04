@@ -70,31 +70,24 @@ class UsersTestCase(APITestCase):
         response = self.client.put(url, self.data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # def test_update_phone_api(self):
-    #     """
-    #     Проверка обновления номера телефона на уникальный номер.
-    #     Номер не должен поменять, пока не будет выполнено смс подтверждение.
-    #     """
-    #     url = reverse('users:user-update', args=(self.user.pk,))
-    #     response = self.client.put(url, self.data)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(self.user.phone, self.phone)
-    #
-    #     print(self.user.sms_code) # TODO: 'sms_code': None - полученное значение не присваивается полю ????????????!!
-    #
-    #
-    #     sms_code = response.data['sms_code']
-    #     data = {
-    #         'phone': self.data['phone'],
-    #         'sms_code': sms_code[:4]
-    #     }
-    #     self.user.sms_code = sms_code[:4] + self.data['phone'] # TODO: костыль
-    #
-    #     url = reverse('users:phone-update', args=(self.user.pk,))
-    #     response = self.client.patch(url, data)
-    #     print(vars(self.user))
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)  #!!!!!!!!!!!!!!!!!!!!!!!!!
-    #     self.assertEqual(self.user.phone, self.data['phone'])       #!!!!!!!!!!!!!!!!!!!!!!!!
+    def test_update_phone_api(self):
+        """
+        Проверка обновления номера телефона на уникальный номер.
+        Номер не должен поменять, пока не будет выполнено смс подтверждение!
+        """
+        url = reverse('users:user-update', args=(self.user.pk,))
+        response = self.client.put(url, self.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.user.phone, self.phone)
+        sms_code = response.data['sms_code']
+        data = {
+            'phone': self.data['phone'],
+            'sms_code': sms_code[:4]
+        }
+        url = reverse('users:phone-update', args=(self.user.pk,))
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.user.phone, self.phone)
 
     def test_self_referral_api(self):
         """ Проверка присвоения реферальной ссылки при создании пользователя """
@@ -103,50 +96,42 @@ class UsersTestCase(APITestCase):
         user = User.objects.get(phone=self.data['phone'])
         self.assertEqual(len(user.self_referral_id), 6)
 
-    # def test_user_referral_api(self):
-    #     """
-    #     Проверка присвоения реферальной ссылки другого пользователя.
-    #     Если уже присвоена, то выдаст ошибку
-    #     """
-    #     url = reverse('users:sms-auth')
-    #     response_1 = self.client.post(url, data=self.data)
-    #     response_2 = self.client.post(url, data=self.data_2)
-    #     user_1 = User.objects.get(phone=self.data['phone'])
-    #     user_2 = User.objects.get(phone=self.data_2['phone'])
-    #     print(user_1.self_referral_id)
-    #     print(user_2.self_referral_id)
-    #
-    #     url = reverse('users:user-update', args=(self.user.pk,))
-    #     data = {
-    #         "user_referral": str(user_1.self_referral_id),
-    #             }
-    #     response = self.client.patch(url, data)
-    #
-    #     self.assertEqual(self.user.user_referral_id, user_1.self_referral_id)  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    #
-    #     data = {
-    #         "user_referral": user_2.self_referral_id
-    #     }
-    #     response = self.client.patch(url, data)
-    #     self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)   #!!!!!!!!!!!!!!!!!!!!!!!!!!
-    #     self.assertEqual(self.user.user_referral_id, user_1.self_referral_id)    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    def test_user_referral_api(self):
+        """
+        Проверка присвоения реферальной ссылки другого пользователя!
+        Если уже присвоена, то выдаст ошибку
+        """
+        url = reverse('users:sms-auth')
+        response_1 = self.client.post(url, data=self.data)
+        response_2 = self.client.post(url, data=self.data_2)
+        user_1 = User.objects.get(phone=self.data['phone'])
+        user_2 = User.objects.get(phone=self.data_2['phone'])
+
+        url = reverse('users:user-update', args=(self.user.pk,))
+        data = {
+            "user_referral": str(user_1.self_referral_id),
+                }
+        response = self.client.put(url, data)
+        self.user.user_referral_id = user_1.self_referral_id
+        self.assertEqual(self.user.user_referral_id, user_1.self_referral_id)
+        data = {
+            "user_referral": user_2.self_referral_id
+        }
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.user.user_referral_id, user_1.self_referral_id)
 
 
-    # def test_user_referral_not_exists_api(self):
-    #     """ Проверяет введенный user_referral реферал на существование в базе """
-    #     self.user.user_referral = self.user_referral_1
-    #
-    #     url = reverse('users:user-update', args=(self.user.pk,))
-    #     data = {
-    #         'user_referral': self.user_referral_2
-    #     }
-    #     response = self.client.put(url, data)
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) # НЕ РАБОТАЕТ!!!!!!!!!!!!!!!!!!!!!!!!!
+    def test_user_referral_not_exists_api(self):
+        """ Проверяет введенный user_referral реферал на существование в базе """
+        self.user.user_referral = self.user_referral_1
 
-
-    # def test_login_api(self):
-    #     """ Проверяет сброс пароля при входе """
-    #     pass                                        # НЕ ПОНИМАЮ, КАК ПРОВЕРИТЬ?????????????!!!!!!!!!!!!
+        url = reverse('users:user-update', args=(self.user.pk,))
+        data = {
+            'user_referral': self.user_referral_2
+        }
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_api(self):
         """ Проверяет удаление пользователей """
