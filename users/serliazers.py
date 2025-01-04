@@ -1,7 +1,7 @@
 import secrets
 
 from rest_framework import serializers
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from users.models import User, Referral
@@ -35,7 +35,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # Исключаем поля для frontend
-        exclude = ('id', 'password', 'last_login', 'is_active', 'date_joined', 'groups', 'user_permissions', 'is_staff', 'is_superuser',)
+        exclude = ('id', 'password', 'last_login', 'is_active', 'date_joined', 'groups', 'user_permissions',
+                   'is_staff', 'is_superuser',)
 
     def validate_user_referral(self, value):
         """ Если user_referral уже вводился, генерирует ошибку """

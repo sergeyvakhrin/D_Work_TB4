@@ -62,7 +62,6 @@ REST_FRAMEWORK = {
                                                      # IsAuthenticated закрыть от всех не авторезированных
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', # Пагинация по умолчанию для всего проекта
-
 }
 # Настройки срока действия токенов
 SIMPLE_JWT = {

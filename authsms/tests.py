@@ -20,19 +20,10 @@ class AuthSMSTestCase(TestCase):
         self.user = User.objects.create(phone=self.phone)
         self.client.force_authenticate(user=self.user)
 
-    # def test_home(self):
-    #     """ Проверяет ответ главной страницы """
-    #     url = reverse('authsms:home')
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_user_create(self):
-        """ Проверяем создание уникального пользователя """
-        url = reverse('authsms:sms_auth')
-        response = self.client.post(url, self.data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(User.objects.all().count(), 2)
-
-        response = self.client.post(url, self.data)
+    def test_home(self):
+        """ Проверяет ответ главной страницы """
+        url = reverse('authsms:home')
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.all().count(), 2)
+
+

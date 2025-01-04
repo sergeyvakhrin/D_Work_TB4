@@ -1,11 +1,12 @@
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from users.models import User
 from users.serliazers import PhoneSerializer, UserSerializer, MyTokenObtainPairSerializer, UserPhoneUpdateSerializer
-from users.servises import user_validation, IsOwner
+from users.servises import user_validation, IsOwner, send_sms
 
 
 class SMSAuthenticationView(APIView):
