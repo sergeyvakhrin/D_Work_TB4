@@ -16,7 +16,7 @@ class UserProfileForm(UserChangeForm):
     """ Класс создания формы для просмотра деталей профиля пользователя """
     class Meta:
         model = User
-        fields = ('phone', 'email', 'first_name', 'last_name',  'avatar', 'self_referral', 'user_referral',)
+        fields = ('phone', 'email', 'first_name', 'last_name', 'avatar', 'self_referral', 'user_referral',)
 
     def __init__(self, *args, **kwargs):
         """

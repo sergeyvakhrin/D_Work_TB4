@@ -17,7 +17,6 @@ def send_sms(phone):
     a = random.sample(cookies, 4)
     sms_code = ''.join(a)
 
-    # sms_code = '1234'
     print(f'send_sms {phone}') # TODO: реализовать с помощью https://smsaero.ru/integration/api/
     print(f'sms-code: {sms_code}')
     return sms_code

@@ -58,7 +58,7 @@ class UsersTestCase(APITestCase):
         data = {
             'email': 'admin@sky.pro',
             'first_name': 'Mikula'
-            }
+                }
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -110,7 +110,7 @@ class UsersTestCase(APITestCase):
         url = reverse('users:user-update', args=(self.user.pk,))
         data = {
             "user_referral": str(user_1.self_referral_id),
-                }
+        }
         response = self.client.put(url, data)
         self.user.user_referral_id = user_1.self_referral_id
         self.assertEqual(self.user.user_referral_id, user_1.self_referral_id)
