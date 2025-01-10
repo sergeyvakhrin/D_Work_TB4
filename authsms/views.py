@@ -28,9 +28,15 @@ class RegisterView(CreateView):
 
     def post(self, request, *args, **kwargs):
         """ Метод для проверки существования введенного номера телефона """
-        phone = request._post.get('phone')
+        phone = request.POST.get('phone')
         user_validation(phone)
         return redirect(reverse('authsms:login'))
+
+    # def form_valid(self, form):
+    #
+    #     phone = form.instance
+    #
+    #     return super().form_valid(form)
 
 
 def logout_view(request):
@@ -58,7 +64,7 @@ class UserProfileView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         user = self.request.user
         user_phone = user.phone
         print(user.pk)
-        input_phone = request._post.get('phone')
+        input_phone = request.POST.get('phone')
 
         # Отлавливаем изменение номера телефона
         if user.phone != input_phone:
