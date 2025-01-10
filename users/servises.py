@@ -84,7 +84,7 @@ class IsOwner(permissions.BasePermission):
 def validate_group(name):
     """
     Проверяем наличие группы Пользователи. Если нет, то создаем с необходимыми правами.
-    Новые пользователи будут добавляться в эту группы, что бы работы permissions.
+    Новые пользователи будут добавляться в эту группы, что бы работали permissions.
     """
     group = Group.objects.filter(name=name).first()
     if group is None:

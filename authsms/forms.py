@@ -17,6 +17,11 @@ class UserProfileForm(UserChangeForm):
     class Meta:
         model = User
         fields = ('phone', 'email', 'first_name', 'last_name', 'avatar', 'self_referral', 'user_referral',)
+        # widgets = {
+        #     'password': forms.HiddenInput(),
+        #     'self_referral': forms.TextInput(attrs={'class': 'form-control'}),
+        #     'user_referral': forms.TextInput(attrs={'class': 'form-control'}),
+        # }
 
     def __init__(self, *args, **kwargs):
         """
@@ -42,6 +47,7 @@ class UserChangePhoneForm(ModelForm):
     class Meta:
         model = User
         fields = ['phone', 'password']
+        labels = {'password': 'СМС-код'}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
